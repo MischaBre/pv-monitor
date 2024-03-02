@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana-oss
+    ports: 
+      - 3000:3000
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_PORT=${VIRTUAL_PORT}
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - db-backend
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - db-backend 
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PW}
+      POSTGRES_DB: ${DB_DB}
+  worker:
+    build: worker
+    restart: always
+    networks:
+      - db-backend
+
+volumes:
+  grafana-storage: {}
+  pgdata: {}
+networks:
+  db-backend:
