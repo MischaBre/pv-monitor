@@ -20,19 +20,25 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - db-backend 
+      db-backend:
+        aliases:
+          - db
     restart: always
     # set shared memory limit when using docker-compose
     shm_size: 128mb
     environment:
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PW}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DB}
   worker:
-    build: worker
-    restart: always
+    build: 
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: unless-stopped
     networks:
       - db-backend
+    depends_on:
+      - db
 
 volumes:
   grafana-storage: {}

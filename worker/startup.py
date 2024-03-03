@@ -1,3 +1,0 @@
-
-def startup():
-    print("startup")

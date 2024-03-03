@@ -6,8 +6,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY . worker
+COPY worker worker
 
-RUN pip install -r worker/requirements.txt
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-CMD ["python", "worker/run.py"]
+COPY .env .
+
+CMD ["python", "-m", "worker.run"]
