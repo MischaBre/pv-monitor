@@ -10,6 +10,4 @@ COPY . worker
 
 RUN pip install -r worker/requirements.txt
 
-RUN python -m worker.startup
-
-CMD ["/bin/bash", "worker/run.sh"]
+CMD ["python", "worker/run.py"]
