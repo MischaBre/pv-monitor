@@ -7,8 +7,9 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY worker worker
-
 COPY requirements.txt .
+COPY devices.json .
+
 RUN pip install -r requirements.txt
 
 COPY .env .

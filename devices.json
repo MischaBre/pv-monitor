@@ -1,0 +1,18 @@
+{
+    "devices": [
+        {
+            "port": "/dev/ttyUSB0",
+            "baud": 9600,
+            "bit": 8,
+            "parity": "none",
+            "stopbits": 1
+        },
+        {
+            "port": "/dev/ttyUSB1",
+            "baud": 9600,
+            "bit": 8,
+            "parity": "none",
+            "stopbits": 1
+        }
+    ]
+}

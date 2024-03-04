@@ -66,12 +66,13 @@ def parse_data(data):
     }
 
 
-def read_lines_and_write_db(serial_port):
+def read_lines_and_write_db(device):
     try:
-        serial_baud = os.environ.get("SERIAL_BAUD")
-        serial_bit = os.environ.get("SERIAL_BIT")
-        serial_parity = os.environ.get("SERIAL_PARITY")
-        serial_stopbits = os.environ.get("SERIAL_STOPBITS")
+        serial_port = device.get("port")
+        serial_baud = device.get("baud")
+        serial_bit = device.get("bit")
+        serial_parity = device.get("parity")
+        serial_stopbits = device.get("stopbits")
 
         bytesize = BYTESIZE_DICT.get(serial_bit, serial.EIGHTBITS)
         parity = PARITY_DICT.get(serial_parity, serial.PARITY_NONE)

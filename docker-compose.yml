@@ -39,6 +39,9 @@ services:
       - db-backend
     depends_on:
       - db
+    # devices:
+    #  - "/dev/ttyUSB0:/dev/ttyUSB0"
+    #  - "/dev/ttyUSB1:/dev/ttyUSB1"
 
 volumes:
   grafana-storage: {}
