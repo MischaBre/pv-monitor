@@ -66,16 +66,21 @@ def parse_data(data):
     }
 
 
-def read_lines_and_write_db():
-    serial_port = os.environ.get("SERIAL_PORT")
-    serial_baud = os.environ.get("SERIAL_BAUD")
-    serial_bit = os.environ.get("SERIAL_BIT")
-    serial_parity = os.environ.get("SERIAL_PARITY")
-    serial_stopbits = os.environ.get("SERIAL_STOPBITS")
+def read_lines_and_write_db(serial_port):
+    try:
+        serial_baud = os.environ.get("SERIAL_BAUD")
+        serial_bit = os.environ.get("SERIAL_BIT")
+        serial_parity = os.environ.get("SERIAL_PARITY")
+        serial_stopbits = os.environ.get("SERIAL_STOPBITS")
 
-    bytesize = BYTESIZE_DICT.get(serial_bit, serial.EIGHTBITS)
-    parity = PARITY_DICT.get(serial_parity, serial.PARITY_NONE)
-    stopbits = STOPBITS_DICT.get(str(serial_stopbits), serial.STOPBITS_ONE)
+        bytesize = BYTESIZE_DICT.get(serial_bit, serial.EIGHTBITS)
+        parity = PARITY_DICT.get(serial_parity, serial.PARITY_NONE)
+        stopbits = STOPBITS_DICT.get(str(serial_stopbits), serial.STOPBITS_ONE)
+        
+    except Exception:
+        log.error(f"{serial_port}: could not read serial .env: {e.args[0]}")
+        time.sleep(60)
+        read_lines_and_write_db(serial_port)
 
     if os.environ.get("DEV", "false") == "true":
         while True:
@@ -83,23 +88,35 @@ def read_lines_and_write_db():
             log.info("got data")
             if line:
                 data = parse_data(line)
-                write_data(data=data)
+                write_data(port= serial_port, data=data)
             time.sleep(10)
-
-    with serial.Serial(
-        port=serial_port,
-        baudrate=serial_baud,
-        parity=parity,
-        bytesize=bytesize,
-        stopbits=stopbits,
-    ) as ser:
-        while True:
-            line = ser.readline().strip().decode("utf-8")
-            log.info("got data")
-            if line:
-                data = parse_data(line)
-                write_data(data=data)
-
+    try:
+        with serial.Serial(
+            port=serial_port,
+            baudrate=serial_baud,
+            parity=parity,
+            bytesize=bytesize,
+            stopbits=stopbits,
+        ) as ser:
+            while True:
+                line = ser.readline().strip().decode("utf-8")
+                log.info("got data")
+                if line:
+                    try:
+                        data = parse_data(line)
+                    except Exception as e:
+                        log.error(f"{serial_port}: could not parse data: {e.args[0]}")
+                        data = None
+                    try:
+                        if data is not None:
+                            write_data(data=data)
+                    except Exception as e:
+                        log.error(f"{serial_port}: could not write data: {e.args[0]}")
+                    
+    except Exception as e:
+        log.error(f"{serial_port}: error initializing serial connection: {e.args[0]}")
+        time.sleep(60)
+        read_lines_and_write_db(serial_port)
 
 import random
 

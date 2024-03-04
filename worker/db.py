@@ -45,6 +45,7 @@ def create_table_if_not_exists():
                 f"""
                 CREATE TABLE IF NOT EXISTS {table_name} (
                     id SERIAL PRIMARY KEY,
+                    device VARCHAR(50),
                     timestamp TIMESTAMP,
                     status INTEGER,
                     voltage FLOAT,
@@ -62,7 +63,7 @@ def create_table_if_not_exists():
     log.info(f"table {table_name} created")
 
 
-def write_data(data):
+def write_data(port, data):
     table_name = os.environ.get("DB_TABLE")
 
     if table_name is None:
@@ -72,11 +73,12 @@ def write_data(data):
         with conn.cursor() as cursor:
             cursor.execute(
                 f"""
-                    INSERT INTO {table_name} (timestamp, status, voltage, current, power, net_voltage, net_current, net_power, temperature) 
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO {table_name} (timestamp, device, status, voltage, current, power, net_voltage, net_current, net_power, temperature) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     data["timestamp"],
+                    port,
                     data["status"],
                     data["voltage"],
                     data["current"],
