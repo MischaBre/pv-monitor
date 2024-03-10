@@ -1,18 +1,18 @@
 version: "3.8"
 services:
-  grafana:
-    image: grafana/grafana-oss
-    ports: 
-      - 3000:3000
-    container_name: grafana
-    restart: unless-stopped
-    environment:
-      - VIRTUAL_HOST=${VIRTUAL_HOST}
-      - VIRTUAL_PORT=${VIRTUAL_PORT}
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    networks:
-      - db-backend
+#  grafana:
+#    image: grafana/grafana-oss
+#    ports: 
+#      - 3000:3000
+#    container_name: grafana
+#    restart: unless-stopped
+#    environment:
+#      - VIRTUAL_HOST=${VIRTUAL_HOST}
+#      - VIRTUAL_PORT=${VIRTUAL_PORT}
+#    volumes:
+#      - grafana-storage:/var/lib/grafana
+#    networks:
+#      - db-backend
   db:
     image: postgres
     ports:
@@ -30,6 +30,9 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DB}
+    labels:
+      logging: "promtail"
+      logging_jobname: "pv-monitor-db"
   worker:
     build: 
       context: .
@@ -39,12 +42,15 @@ services:
       - db-backend
     depends_on:
       - db
+    labels:
+      logging: "promtail"
+      logging_jobname: "pv-monitor-worker"
     # devices:
     #  - "/dev/ttyUSB0:/dev/ttyUSB0"
     #  - "/dev/ttyUSB1:/dev/ttyUSB1"
 
 volumes:
-  grafana-storage: {}
+#  grafana-storage: {}
   pgdata: {}
 networks:
   db-backend:
